@@ -17,27 +17,49 @@ const headerList = mainHeader.getElementsByClassName('main-header__list')[0];
  * @returns void
  */
 const sortOutMainMenu = (function() {
-    let isSmall = false; //isSmall used to see if we are inside a certain diminutive media query or not. Allows for cohesion with the css of the main header.
+    /**
+     * @type Boolean Determines whether our <header> is in expanded mode or not. Needed for the animation in the forthcoming image.
+       This animation needs to know whether to expand the <header>, as it is already open, or collapse it.
+     */
+    let isCollapsed = false;
+    /**
+     * @type int Count the number of times called. Needed for initial load. Don't want to play any animations, either opening or closing,
+       on initial document load
+     */
+    let counter = 0;
 
     return function(){
         if(window.innerWidth < 992){
-            isSmall = true;
             return;
         }
-        if(isSmall){
-            mainHeader.classList.add('main-header--no_transition');
-            setTimeout(() => {
-                mainHeader.classList.remove('main-header--no_transition');
-            }, 5);
-            isSmall = false;
-        }
+        counter++;
         const offsetTop = document.body.getBoundingClientRect().top;
-        if(offsetTop < 40 && !mainHeader.classList.contains('main-header--small')){
-            mainHeader.classList.add('main-header--small');
+        if(offsetTop < 40 && !isCollapsed){
+            gsap.timeline({defaults: {duration: counter>1 ? 0.25 : 0, ease: 'power1'}})
+                .to(mainHeader.getElementsByClassName('main-header__title')[0], {
+                    fontSize: '2rem'
+                }, 0)
+                .to(mainHeader.getElementsByClassName('main-header__sub_title')[0], {
+                    opacity: 0
+                }, 0)
+                .to(mainHeader.getElementsByClassName('main-header__left-section')[0], {
+                    height: '43px'
+                }, 0);
+            isCollapsed = true;
             return;
         }
-        if(offsetTop > 39 && mainHeader.classList.contains('main-header--small')){
-            mainHeader.classList.remove('main-header--small');
+        if(offsetTop > 39 && isCollapsed){
+            gsap.timeline({defaults: {duration: 0.25, ease: 'power1'}})
+                .to(mainHeader.getElementsByClassName('main-header__title')[0], {
+                    fontSize: '2.5rem'
+                }, 0)
+                .to(mainHeader.getElementsByClassName('main-header__sub_title')[0], {
+                    opacity: 1
+                }, 0)
+                .to(mainHeader.getElementsByClassName('main-header__left-section')[0], {
+                    height: '69px'
+                }, 0);
+            isCollapsed = false;
         }
     }
 })();
@@ -56,7 +78,7 @@ addEventListener('resize', sortOutMainMenu);
  */
 const configureHamburgerHeaderList = (function(){
     /** 
-     * @var isOpen determines whether the hamburger menu drop-down is open or not. Used to decide whether we should open or close
+     * @type Boolean Determines whether the hamburger menu drop-down is open or not. Used to decide whether we should open or close
        this drop-down menu in the coming function.
     */
     let isOpen = false;

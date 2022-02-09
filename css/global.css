@@ -47,38 +47,19 @@ button, input, select, textarea {
     overflow: hidden;
     height: 69px;
     position: relative;
-    transition: all 0.25s;
 }
 
 .main-header__title{
     font-size: 2.5rem;
-    transition: all 0.25s;
 }
 
 .main-header__sub_title{
     color: gray;
     font-style:italic;
     font-size: 1.1rem;
-    transition: all 0.25s;
     position: absolute;
     top: 45px;
     left: 0;
-}
-
-.main-header--no_transition *{
-    transition: none;
-}
-
-.main-header--small .main-header__title{
-    font-size: 2rem;
-}
-
-.main-header--small .main-header__sub_title{
-    opacity: 0;
-}
-
-.main-header--small .main-header__left-section{
-    height: 43px;
 }
 
 
@@ -145,18 +126,6 @@ button, input, select, textarea {
     
     .main-header--small .main-header__left-section{
         height: 69px;
-    }
-
-    .main-header__title{
-        transition: none;
-    }
-    
-    .main-header__sub_title{
-        transition: none;
-    }
-    
-    .main-header__left-section{
-        transition: none;
     }
 }
 
