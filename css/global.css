@@ -1,0 +1,218 @@
+*{
+    line-height: 1.2;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p{
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 1.3rem;
+    word-wrap:break-word;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: 100%;
+}
+
+.container{
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+
+.main-header{
+    padding: 10px 10px 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    align-items: center;
+    box-shadow: inset 0 -15px 5px -10px rgba(0,0,0,0.04);
+    z-index: 1;
+}
+
+.main-header__left-section{
+    overflow: hidden;
+    height: 69px;
+    position: relative;
+    transition: all 0.25s;
+}
+
+.main-header__title{
+    font-size: 2.5rem;
+    transition: all 0.25s;
+}
+
+.main-header__sub_title{
+    color: gray;
+    font-style:italic;
+    font-size: 1.1rem;
+    transition: all 0.25s;
+    position: absolute;
+    top: 45px;
+    left: 0;
+}
+
+.main-header--no_transition *{
+    transition: none;
+}
+
+.main-header--small .main-header__title{
+    font-size: 2rem;
+}
+
+.main-header--small .main-header__sub_title{
+    opacity: 0;
+}
+
+.main-header--small .main-header__left-section{
+    height: 43px;
+}
+
+
+.main-header__list{
+    list-style: none;
+    text-align: right;
+    overflow: auto;
+}
+
+.main-header__options{
+    float:left;
+    font-size: 1.3rem;
+    padding: 5px 20px;
+    transition: color 0.25s,background-color 0.25s;
+}
+
+.main-header__options:hover{
+    background-color: black;
+    color: white;
+}
+
+.main-header__hamburger{
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.main-header__hamburger::before{
+    content: "";
+    width: 100%;
+    height: 6px;
+    background-color: black;
+    border-radius: 1rem;
+}
+.main-header__hamburger::after{
+    content: "";
+    width: 100%;
+    height: 6px;
+    background-color: black;
+    border-radius: 1rem;
+}
+.main-header__hamburger_center{
+    width: 100%;
+    height: 6px;
+    background-color: black;
+    border-radius: 1rem;
+}
+
+@media (max-width: 991px){
+    .main-header{
+        position: absolute;
+    }
+
+    .main-header--small .main-header__title{
+        font-size: 2.5rem;
+    }
+    
+    .main-header--small .main-header__sub_title{
+        opacity: 1;
+    }
+    
+    .main-header--small .main-header__left-section{
+        height: 69px;
+    }
+
+    .main-header__title{
+        transition: none;
+    }
+    
+    .main-header__sub_title{
+        transition: none;
+    }
+    
+    .main-header__left-section{
+        transition: none;
+    }
+}
+
+@media (max-width: 767px){
+    .main-header__list{
+        display: block;
+        text-align: left;
+        position: absolute;
+        left: 0;
+        top: 89px;
+        width: 100%;
+        background-color: lightgray;
+        overflow: hidden;
+        height: 0px;
+    }
+    .main-header__options{
+        float:none;
+        padding: 15px 0 15px 22px;
+    }
+    .main-header__hamburger{
+        display: flex;
+    }
+}
+
+@media (max-width: 575px){
+    .main-header__list{
+        top: 80px;
+        height: 0px;
+        max-height: 159px;
+    }
+    .main-header__options{
+        font-size: 1.2rem;
+    }
+    .main-header__title{
+        font-size: 2rem;
+    }
+    .main-header__sub_title{
+        font-size: 1rem;
+    }
+    .main-header__hamburger{
+        width: 40px;
+        height: 40px;
+    }
+    .main-header__hamburger::before{
+        height: 5px;
+    }
+    .main-header__hamburger::after{
+        height: 5px;
+    }
+    .main-header__hamburger_center{
+        height: 5px;
+    }
+    .main-header__left-section{
+        height: 60px;
+    }
+    .main-header__sub_title{
+        top:38px;
+    }
+}
