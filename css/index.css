@@ -60,3 +60,8 @@
         flex-wrap: wrap;
     }
 }
+@media (max-width: 575px){
+    .about__title{
+        margin-top: 120px;
+    }
+}

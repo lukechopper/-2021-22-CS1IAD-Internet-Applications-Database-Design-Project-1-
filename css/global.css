@@ -67,6 +67,8 @@ button, input, select, textarea {
     list-style: none;
     text-align: right;
     overflow: auto;
+    min-height: 35px;
+    max-height: 35px;
 }
 
 .main-header__options{
@@ -88,17 +90,16 @@ button, input, select, textarea {
     width: 50px;
     height: 50px;
     cursor: pointer;
+    overflow: hidden;
 }
 
-.main-header__hamburger::before{
-    content: "";
+.main-header__hamburger_top{
     width: 100%;
     height: 6px;
     background-color: black;
     border-radius: 1rem;
 }
-.main-header__hamburger::after{
-    content: "";
+.main-header__hamburger_bottom{
     width: 100%;
     height: 6px;
     background-color: black;
@@ -115,18 +116,6 @@ button, input, select, textarea {
     .main-header{
         position: absolute;
     }
-
-    .main-header--small .main-header__title{
-        font-size: 2.5rem;
-    }
-    
-    .main-header--small .main-header__sub_title{
-        opacity: 1;
-    }
-    
-    .main-header--small .main-header__left-section{
-        height: 69px;
-    }
 }
 
 @media (max-width: 767px){
@@ -140,10 +129,16 @@ button, input, select, textarea {
         background-color: lightgray;
         overflow: hidden;
         height: 0px;
+        max-height: 224px;
+        min-height: 0px;
+    }
+    .main-header__list.main-header__list--hamburger-small-open{
+        min-height: 224px;
     }
     .main-header__options{
         float:none;
-        padding: 15px 0 15px 22px;
+        padding: 20px 0 20px 22px;
+        font-size: 1.8rem;
     }
     .main-header__hamburger{
         display: flex;
@@ -154,10 +149,13 @@ button, input, select, textarea {
     .main-header__list{
         top: 80px;
         height: 0px;
-        max-height: 159px;
+        max-height: 195px;
+    }
+    .main-header__list.main-header__list--hamburger-small-open{
+        min-height: 0px;
     }
     .main-header__options{
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     .main-header__title{
         font-size: 2rem;
@@ -169,10 +167,10 @@ button, input, select, textarea {
         width: 40px;
         height: 40px;
     }
-    .main-header__hamburger::before{
+    .main-header__hamburger_top{
         height: 5px;
     }
-    .main-header__hamburger::after{
+    .main-header__hamburger_bottom{
         height: 5px;
     }
     .main-header__hamburger_center{
