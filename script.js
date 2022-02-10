@@ -63,13 +63,20 @@ const sortOutMainMenu = (function() {
     }
 })();
 /**
- * These next 3 lines call the 'sortOutMainMenu' function when it is required. I.e., on document load, when the window size is changed
-   and when we scroll our window.
+ * The necessary event listeners for 'sortOutMainMenu'. They will execute this function as soon as the document loads and
+   whenever we scroll on it. The 'sortOutMainMenu' is also called in the function that is passed into the 'resize' event listener.
+   But, here, it is called directly by these event listeners.
  */
 addEventListener('scroll', sortOutMainMenu);
 addEventListener('load', sortOutMainMenu);
+/**
+ * The function that is made to be the callback of the 'resize' event listener. Is used to resolve errors relating to animations, 
+   styling, etc, hence why it is called whenever we resize our browser: so that when the incumbent media query changes, we can
+   respond to it changing here.
+ * @returns void
+ */
 const windowResize = (function(){
-    let windowState = '';
+    let windowState = '';//String variable that is used to keep track of which media query is currently incumbent.
     function setWindowState(){
         if(window.innerWidth < 576){
             windowState = 'smallest';
@@ -77,10 +84,23 @@ const windowResize = (function(){
             windowState = 'small';
         }
     }; setWindowState();
+
+    function animateHamburgerOpenSmallLarge(type){
+        if(headerHamburger.getAttribute('open') !== 'true') return;
+        if(type === 'large'){
+            animateHeaderHamburger('open_large', 0);
+        }else if(type === 'small'){
+            animateHeaderHamburger('open_small', 0);
+        }
+    }
     
     return function(){
         sortOutMainMenu();
-        let oldWindowState = windowState;
+        if(windowState === 'smallest' && window.innerWidth > 575){
+            animateHamburgerOpenSmallLarge('large');
+        }else if(windowState === 'small' && window.innerWidth < 576){
+            animateHamburgerOpenSmallLarge('small');
+        }
         setWindowState();
     }
 })();
