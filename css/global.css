@@ -17,6 +17,10 @@ a{
     text-decoration: none;
 }
 
+.inline{
+    display: inline;
+}
+
 button, input, select, textarea {
     font-family: inherit;
     font-size: 100%;
@@ -114,7 +118,9 @@ button, input, select, textarea {
 
 @media (max-width: 991px){
     .main-header{
-        position: absolute;
+        /* 'main-header' doesn't actually change here. Rather, this media query is just here to signify the point where its animation 
+        style changes to be something different. */
+        position: fixed;
     }
 }
 
