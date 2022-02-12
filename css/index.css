@@ -1,15 +1,9 @@
 
 .about__title{
     margin-top: 140px;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 2.5rem;
 }
 .about__title-underline{
-    background-color: black;
     width: 100px;
-    height: 5px;
-    margin: 0 auto;
 }
 .about__sub-title{
     font-size: 2rem;
@@ -63,5 +57,204 @@
 @media (max-width: 575px){
     .about__title{
         margin-top: 120px;
+    }
+}
+
+.education__title{
+    margin-top: 60px;
+}
+.education__title-underline{
+    width: 170px;
+}
+.general-list-item{
+    margin-top: 40px;
+    justify-content: space-between;
+    display: flex;
+}
+.general-list-item em{
+    width: 280px;
+    text-align: right;
+}
+@media (max-width: 767px){
+    .general-list-item{
+        justify-content: flex-start;
+        flex-direction: column;
+    }
+    .general-list-item em{
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: left;
+    }
+}
+
+.experience__title{
+    margin-top: 60px;
+}
+.experience__title-underline{
+    width: 200px;
+}
+
+.skills__title{
+    margin-top: 60px;
+}
+.skills__title-underline{
+    width: 90px;
+    margin-bottom: 40px;
+}
+.skills-list-row{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.skills-list-row .skills-list-row__item:nth-child(1){
+    margin-right: 20px;
+}
+.skills-list-row__item{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.skills-list-row__name{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 190px;
+    background-color: #f2f2f2;
+    font-weight: bold;
+    font-size: 1rem;
+    height: 50px;
+    overflow: hidden;
+}
+.skills-list-row__img{
+    padding: 5px 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.skills-list-row__bar-background{
+    position: relative;
+    width: 100%;
+    background-color: darkgray;
+}
+.skills-list-row__percentage{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 1.4rem;
+}
+.skills-list-row__percentage-bar{
+    height: 100%;
+    background-color: black;
+}
+.skills-list-row__percentage-bar--90{
+    width: 90%;
+}
+.skills-list-row__percentage-bar--80{
+    width: 80%;
+}
+.skills-list-row__percentage-bar--70{
+    width: 70%;
+}
+.skills-list-row__percentage-bar--60{
+    width: 60%;
+}
+.skills-list-row__percentage-bar--50{
+    width: 50%;
+}
+
+@media (max-width: 991px){
+    .skills-list-row{
+        display: block;
+    }
+    .skills-list-row__item{
+        margin-top: 20px;
+    }
+}
+@media (max-width: 575px){
+    .skills-list-row__name{
+        font-size: 0.9rem;
+    }
+    .skills-list-row__percentage{
+        font-size: 1.2rem;
+    }
+}
+
+.hobbies__title{
+    margin-top: 60px;
+}
+.hobbies__title-underline{
+    width: 120px;
+}
+.hobbies__list{
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+.hobbies__list li{
+    font-size: 1.8rem;
+    margin-left: 25px;
+}
+
+@media (max-width: 767px){
+    .hobbies__list{
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+}
+@media (max-width: 415px){
+    .hobbies__list li{
+        font-size: 1.4rem;
+    }
+}
+
+.projects__title{
+    margin-top: 60px;
+}
+.projects__title-underline{
+    width: 120px;
+    margin-bottom: 40px;
+}
+.projects__list{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.projects__list-img{
+    width: 350px;
+    height: auto;
+}
+.projects__list-para{
+    margin-left: 20px;
+}
+.projects__list--left .projects__list-para{
+    margin-left: 0px;
+}
+.projects__list--left .projects__list-img{
+    margin-left: 20px;
+}
+@media (max-width: 767px){
+    .projects__list{
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    .projects__list-img{
+        max-width: 350px;
+        width: 100%;
+        height: auto;
+    }
+    .projects__list-para{
+        margin-top: 10px;
+        margin-left: 0px;
+    }
+    .projects__list.projects__list--left{
+        flex-direction: column-reverse;
+    }
+    .projects__list--left .projects__list-img{
+        margin-left: 0px;
     }
 }

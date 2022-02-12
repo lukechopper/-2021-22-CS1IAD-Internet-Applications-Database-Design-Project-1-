@@ -213,9 +213,12 @@ const windowResize = (function(){
         if(windowState !== 'smallest' && window.innerWidth < 576){ //Going smallest to anything larger than it.
             animateHamburgerOpenSmallLarge('small');
             mainHeader.getElementsByClassName('main-header__left-section')[0].style.height = '';
+            mainHeader.getElementsByClassName('main-header__title')[0].style.fontSize = '';
         }
         setWindowState();
-        isWindowResizing = false;
+        setTimeout(function(){
+            isWindowResizing = false;
+        }, 10);
     }
 })();
 addEventListener('resize', windowResize);
@@ -312,22 +315,25 @@ function animateHeaderHamburger(type, duration){
 
 //Get access to the section marking the start of the 'Home' option in our nav bar.
 const aboutEle = document.getElementById('about');
+//Get access to the section marking the start of the 'Projects' option in our nav bar.
+const projectsEle = document.getElementById('project');
 //Get access to our main nav options. I.e., the things in our nav bar that we click on.
 const mainHeaderOptions = document.getElementsByClassName('main-header__options');
 //Put the start of each section (where we will scroll to when we click on the relevant nav bar options) in an Array.
-const startSectionsArray = [aboutEle.offsetTop-140];
+const startSectionsArray = [aboutEle, projectsEle, projectsEle];
+//Put the offset of each section in an Array. This is so we can account for the margin of each section.
+const offsetStartSections = [120, 100, 100];
 //Loop through our main nav options so that when we click on them, they can actually take us to somewhere on the page.
 for(let i = 0; i < mainHeaderOptions.length; i++){
     const options = mainHeaderOptions[i];
     options.onclick = function(){
-        const startSectionOffset = startSectionsArray[i];
-        if(startSectionOffset!==undefined){
+        const startSection = startSectionsArray[i];
+        const offset = offsetStartSections[i];
+        const offsetNum = startSection.offsetTop - offset;
             window.scroll({
-                top: startSectionOffset,
-                left: 0,
+                top: offsetNum,
                 behavior: 'smooth'
             });
-        }
     }
 }
 //Get access to the icon on the left of the nav bar so that when we click on it, we can get it to take us to the main starting section.
