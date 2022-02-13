@@ -75,7 +75,10 @@ const sortOutMainMenu = (function() {
         counter++;
         const offsetTop = document.body.getBoundingClientRect().top;
         if(window.innerWidth < 992){
-            if(counter < 2 || isWindowResizing) return;
+            if(counter < 4 || isWindowResizing){
+                offsetTopStore = offsetTop;
+                return;
+            }
             sortSmallerMediaQuery(offsetTop, mainHeader.clientHeight);
         }else{
             sortLargerMediaQuery(offsetTop);
@@ -312,15 +315,21 @@ function animateHeaderHamburger(type, duration){
 //
 //
 
+//START OF OPTIONS SECTION
+//
+//
+//
 
 //Get access to the section marking the start of the 'Home' option in our nav bar.
 const aboutEle = document.getElementById('about');
 //Get access to the section marking the start of the 'Projects' option in our nav bar.
 const projectsEle = document.getElementById('project');
+//Get access to the section marking the start of the 'Contact Me' option in our nav bar.
+const contactMeEle = document.getElementById('contacts');
 //Get access to our main nav options. I.e., the things in our nav bar that we click on.
 const mainHeaderOptions = document.getElementsByClassName('main-header__options');
 //Put the start of each section (where we will scroll to when we click on the relevant nav bar options) in an Array.
-const startSectionsArray = [aboutEle, projectsEle, projectsEle];
+const startSectionsArray = [aboutEle, projectsEle, contactMeEle];
 //Put the offset of each section in an Array. This is so we can account for the margin of each section.
 const offsetStartSections = [120, 100, 100];
 //Loop through our main nav options so that when we click on them, they can actually take us to somewhere on the page.
@@ -338,10 +347,67 @@ for(let i = 0; i < mainHeaderOptions.length; i++){
 }
 //Get access to the icon on the left of the nav bar so that when we click on it, we can get it to take us to the main starting section.
 const mainHeaderLeftIcon = document.getElementById('main-header__left-icon');
-mainHeaderLeftIcon.onclick = function(){
+//Get access to the up chevron in the footer
+const upChevron = document.getElementById('footer__chevron');
+//Create a function that will automatically scroll up to the top of the page. Will be applied as the 'onclick' event handler for elements.
+function scrollUpToHome(){
     window.scroll({
         top: startSectionsArray[0],
         left: 0,
         behavior: 'smooth'
     });
+}
+mainHeaderLeftIcon.onclick = scrollUpToHome;
+upChevron.onclick = scrollUpToHome;
+
+//END OF OPTIONS SECTION
+//
+//
+//
+
+//START OF FORM SECTION
+//
+//
+//
+
+//Get access to our main form element.
+const contactForm = document.getElementById('contact__form');
+
+//The function that we will use to quickly generate error messages
+function generateErrorMessages(errorMsg){
+    const ele = document.createElement('div');
+    ele.classList.add('contact__form-error');
+    ele.textContent = errorMsg;
+    return ele;
+}
+//Create the error message where the user hasn't chosen a contact method.
+const contactMethodError = generateErrorMessages('Need to choose a contact method');
+
+/**
+ * Sort out our contact method <select> tag so that based on what the user has set its value to be, the relevant inputs on the form 
+   will become required.
+ * @var hasSelectedContactMethod Boolean If we haven't selected a contact method, then we don't want the form to be able to be submitted.
+ * @param e The onchange event.
+ * @returns void
+ */
+let hasSelectedContactMethod = false;
+contactForm.contactMethod.onchange = function(e){
+    let selectedOption = e.target.value;
+    hasSelectedContactMethod = true;
+}
+
+/*When we click on the submit button which isn't necessarily the same as submitting the form. Hence, this is where we will be 
+doing error checking.
+*/
+contactForm.submit.onclick = function(){
+    if(!hasSelectedContactMethod){
+        contactForm.insertBefore(contactMethodError, document.getElementById('contactMethodLabel'));
+    }else{
+        contactMethodError.remove();
+    }
+}
+
+contactForm.onsubmit = function(e){
+    e.preventDefault();
+    console.log('SUBMIT');
 }
