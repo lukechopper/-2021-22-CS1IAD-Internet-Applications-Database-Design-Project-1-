@@ -27,7 +27,7 @@
         <a href="#contact"><li class="main-header__options">Contact Me</li></a>
       </ul>
     </header>
-    <main>
+    <main id="main">
       <section class="about container" id="about">
         <h1 class="title about__title">About</h1>
         <div class="underline about__title-underline"></div>
@@ -323,9 +323,9 @@
         <div class="underline contact__title-underline"></div>
         <div class="contact__form-opening-text">
           Here, you can contact me about a potential project. Please enter the
-          start date, or approximate start date, the projects duration, your
-          personal information and any extra comments that you want to make
-          about the project.
+          start date, or approximate start date, the projects duration and your
+          personal information along with a brief comment summarising the main
+          details of your project.
         </div>
         <form class="contact__form" id="contact__form">
           <div class="contact__form-start-and-end-date" id="start-and-end-date">
@@ -372,8 +372,7 @@
             placeholder="Phone Number"
             class="contact__form-text"
           />
-          <label for="contact__form-contact-method"
-            id="contactMethodLabel"
+          <label for="contact__form-contact-method" id="contactMethodLabel"
             >Preferred contact method:</label
           >
           <select
@@ -387,7 +386,10 @@
             <option value="email">Email</option>
             <option value="phone">Phone</option>
           </select>
-          <label for="extra-comments" class="contact__form-text-area-label" id="extra-comments-label"
+          <label
+            for="extra-comments"
+            class="contact__form-text-area-label"
+            id="extra-comments-label"
             >Message:</label
           >
           <textarea
@@ -396,7 +398,12 @@
             class="contact__form-text-area"
             placeholder="Enter your message here..."
           ></textarea>
-          <input type="submit" value="Submit" name="submit" class="contact__form-submit" />
+          <input
+            type="submit"
+            value="Submit"
+            name="submit"
+            class="contact__form-submit"
+          />
         </form>
       </section>
       <footer class="footer">
@@ -405,13 +412,32 @@
           target="_blank"
           ><img src="img/linkedin.png" alt="linkedin" class="footer__img"
         /></a>
-        <a
-          href="https://github.com/lukechopper"
-          target="_blank"
+        <a href="https://github.com/lukechopper" target="_blank"
           ><img src="img/github.png" alt="github" class="footer__img"
         /></a>
-        <img src="img/chevron.png" alt="chevron" class="footer__chevron" id="footer__chevron">
+        <img
+          src="img/chevron.png"
+          alt="chevron"
+          class="footer__chevron"
+          id="footer__chevron"
+        />
       </footer>
+      <!-- <section class="contact-modal" id="contact-modal">
+        <div class="contact-modal__main">
+            <div class="contact-modal__exit-btn">X</div>
+            <h1 class="title contact-modal__title">Confirm</h1>
+            <div class="underline contact-modal__title-underline"></div>
+            <div class="contact-modal__row">
+                <h2 class="contact-modal__header">Start Date:</h2>
+                <p>Arse</p>
+            </div>
+            <div class="contact-modal__row">
+                <h2 class="contact-modal__header">Duration:</h2>
+                <p>Arse</p>
+            </div>
+            <button class="contact-modal__send-btn">Send</button>
+        </div>
+      </section> -->
     </main>
     <!--GSAP. Do not touch.-->
     <script src="gsap/gsap.min.js"></script>

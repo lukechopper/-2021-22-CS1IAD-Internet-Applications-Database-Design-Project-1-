@@ -512,9 +512,11 @@ function removeElements(){
     }
 }
 
-/*When we click on the submit button which isn't necessarily the same as submitting the form. Hence, this is where we will be 
-doing error checking.
-*/
+/**
+ * When we click on the submit button which isn't necessarily the same as submitting the form. Hence, this is where we will be 
+   doing error checking.
+ * @returns void
+ */
 contactForm.submit.onclick = function(){
     let hasBeenError = false;
     //Display error if they haven't entered a start date
@@ -569,8 +571,105 @@ contactForm.submit.onclick = function(){
     }else{
         emptyMessageError.remove();
     }
+
+    //Since there hasn't been any errors up to this point, insert the confirmation modal now.
+    if(!hasBeenError){
+        insertContactModal();
+    }
 }
 
+//Prevent our page from automatically reloading when we click to submit our form.
 contactForm.onsubmit = function(e){
     e.preventDefault();
+}
+
+//Get access to the <main> element of our page so that we can insert our contact modal as the very last child of it
+const mainEle = document.getElementById('main');
+
+//Create the main contact modal <section> element. Both it's id and class will be exactly that: 'contact-modal'.
+function createContactModalEle(){
+    const contactModalEle = document.createElement('section');
+    contactModalEle.setAttribute('class', 'contact-modal');
+    contactModalEle.setAttribute('id', 'contact-modal');
+    return contactModalEle;
+}
+
+/* The event handler for when the exit btn of the contact modal is clicked on. When this happens, we want this function to close down
+the associated contact modal */
+function closeContactModal(){
+
+    //Add the ability to scroll back to our page since our contact modal should now be closed.
+    document.body.parentElement.style.overflow = '';
+
+    const contactModalEle = document.getElementById('contact-modal');
+    if(contactModalEle === undefined) return;
+    contactModalEle.remove();
+}
+
+/* Used when creating the contact modal. If input is empty, then output 'N/A'. If it isn't, then output the actual contents of the 
+specific input passed in. */
+function handleContactModalEmptyInput(inputEleValue){
+    let returnString = 'N/A';
+
+    if(inputEleValue) returnString = inputEleValue;
+
+    return returnString;
+}
+
+/**
+ * Since the form has been submitted without any errors, use this function to add the confirmation modal to our page, summarising
+   the users form input and allowing them to accept it for the final time.
+ * @returns void
+ */
+function insertContactModal(){
+    const contactModalEle = createContactModalEle();
+
+    let contactModalEleString = '<div class="contact-modal__main"> \
+    <div class="contact-modal__exit-btn" id="contact-modal__exit-btn">X</div> \
+    <h1 class="title contact-modal__title">Confirm</h1> \
+    <div class="underline contact-modal__title-underline"></div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">To:</h2> \
+        <p>200126984@aston.ac.uk</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Start Date:</h2> \
+        <p>'+contactForm.startDate.value+'</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Duration:</h2> \
+        <p>'+contactForm.endDate.value+'</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Forename:</h2> \
+        <p>'+contactForm.forename.value+'</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Email:</h2> \
+        <p>'+handleContactModalEmptyInput(contactForm.email.value)+'</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Phone:</h2> \
+        <p>'+handleContactModalEmptyInput(contactForm.phoneNumber.value)+'</p> \
+    </div> \
+    <div class="contact-modal__row"> \
+        <h2 class="contact-modal__header">Message:</h2> \
+        <p>'+contactForm.extraComments.value+'</p> \
+    </div> \
+    <button class="contact-modal__send-btn" id="contact-modal__send-btn">Send</button> \
+    </div>';
+
+    contactModalEle.innerHTML = contactModalEleString;
+    mainEle.appendChild(contactModalEle);
+
+    /* Add the appropriate event listener to the exit btn on the contact form. That is, when we click on this, we want to close
+    down our form. */
+    const exitBtn = document.getElementById('contact-modal__exit-btn');
+    exitBtn.onclick = closeContactModal;
+    const sendBtn = document.getElementById('contact-modal__send-btn');
+    sendBtn.onclick = closeContactModal;
+
+    /* Since our modal is now open, we will now remove scroll from the main page, only to add it back again once our modal 
+    is closed. */
+    document.body.parentElement.style.overflow = 'hidden';
 }
