@@ -328,7 +328,7 @@
           about the project.
         </div>
         <form class="contact__form" id="contact__form">
-          <div class="contact__form-start-and-end-date">
+          <div class="contact__form-start-and-end-date" id="start-and-end-date">
             <div class="contact__form-start-date">
               <label for="start-date">Start date:</label>
               <input
@@ -336,7 +336,6 @@
                 id="start-date"
                 class="contact__form-select contact__form-select--col"
                 name="startDate"
-                required
               />
             </div>
             <div class="contact__form-end-date">
@@ -346,7 +345,6 @@
                 type="text"
                 name="endDate"
                 class="contact__form-select contact__form-select--col"
-                required
               />
             </div>
           </div>
@@ -355,22 +353,21 @@
             name="forename"
             placeholder="Forename"
             class="contact__form-text"
-            required
           />
           <input
-            type="email"
+            type="text"
             name="email"
             placeholder="Email"
             class="contact__form-text"
           />
           <input
-            type="email"
+            type="text"
             name="confirmEmail"
             placeholder="Confirm Email"
             class="contact__form-text"
           />
           <input
-            type="tel"
+            type="text"
             name="phoneNumber"
             placeholder="Phone Number"
             class="contact__form-text"
@@ -383,7 +380,6 @@
             name="contactMethod"
             id="contact__form-contact-method"
             class="contact__form-select"
-            required
           >
             <option value="none" selected disabled hidden>
               Select an Option
@@ -391,13 +387,14 @@
             <option value="email">Email</option>
             <option value="phone">Phone</option>
           </select>
-          <label for="extra-comments" class="contact__form-text-area-label"
-            >Extra comments:</label
+          <label for="extra-comments" class="contact__form-text-area-label" id="extra-comments-label"
+            >Message:</label
           >
           <textarea
             name="extraComments"
             id="extra-comments"
             class="contact__form-text-area"
+            placeholder="Enter your message here..."
           ></textarea>
           <input type="submit" value="Submit" name="submit" class="contact__form-submit" />
         </form>

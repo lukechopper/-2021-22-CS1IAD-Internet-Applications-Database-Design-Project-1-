@@ -380,34 +380,197 @@ function generateErrorMessages(errorMsg){
     ele.textContent = errorMsg;
     return ele;
 }
+//Create the empty start date error message.
+const emptyStartDate = generateErrorMessages('Cannot have an empty start date');
+// Start date needs to be at least one day ahead error
+const incorrectStartDate = generateErrorMessages('Start date needs to be at least one day in the future');
+//Create the error message where they haven't entered a duration.
+const emptyDurationError = generateErrorMessages('Cannot have an empty duration')
+//Create the error message where they haven't entered a forename.
+const emptyForenameError = generateErrorMessages('Cannot have an empty forename');
 //Create the error message where the user hasn't chosen a contact method.
 const contactMethodError = generateErrorMessages('Need to choose a contact method');
+//Create the necessary errors for the first email input.
+const firstEmailEmptyError = generateErrorMessages('Cannot have an empty email'); const secondEmailEmptyError = generateErrorMessages('Please enter an actual email');
+//Create the necessary errors for the second email input.
+const thirdEmailEmptyError = generateErrorMessages('Cannot have an empty email'); const fourthEmailEmptyError = generateErrorMessages('Please enter an actual email');
+//Create the error informing that emails need to match
+const matchingEmailsError = generateErrorMessages('Emails need to match');
+//Create the error informing that the phone input is empty
+const emptyPhoneNumber = generateErrorMessages('Cannot have an empty phone number');
+//Create the error informing that the phone input doesn't represent an actual phone number
+const incorrectPhoneNumberError = generateErrorMessages('This input can only take in numbers and hyphens');
+//Create the error infroming that the message is empty
+const emptyMessageError = generateErrorMessages('Cannot have an empty message');
 
 /**
  * Sort out our contact method <select> tag so that based on what the user has set its value to be, the relevant inputs on the form 
    will become required.
- * @var hasSelectedContactMethod Boolean If we haven't selected a contact method, then we don't want the form to be able to be submitted.
+ * @var contactMethodOption Keep track of the current value of the contact method
  * @param e The onchange event.
  * @returns void
  */
-let hasSelectedContactMethod = false;
+let contactMethodOption = contactForm.contactMethod.value;
 contactForm.contactMethod.onchange = function(e){
     let selectedOption = e.target.value;
-    hasSelectedContactMethod = true;
+    contactMethodOption = selectedOption;
+}
+
+//Do the standard error checking for the 2 email inputs
+function emailInputsErrorChecking(emailInput, emailError1, emailError2){
+    let firstError = false;
+    //Display error if they have chosen email as their contact method but haven't entered anything for the first email input.
+    if(contactMethodOption === 'email' && emailInput.value === ''){
+        contactForm.insertBefore(emailError1, emailInput);
+        firstError = true;
+    }else{
+        emailError1.remove();
+    }
+    //Display error if they haven't entered a proper email.
+    let emailMatch = emailInput.value.match(/([a-z]|[A-Z]|[0-9])+@([a-z]|[A-Z]|[0-9])+\.([a-z]|[A-Z]|[0-9])+/g);
+    if(!emailMatch && !firstError && contactMethodOption === 'email'){
+        contactForm.insertBefore(emailError2, emailInput);
+        firstError = true;
+    }else{
+        emailError2.remove();
+    }
+    return firstError;
+}
+
+//Check that emails need to match
+function matchingEmailsChecker(emailInput1, emailInput2){
+    let hasError = false;
+    if(emailInput1.value !== emailInput2.value){
+        contactForm.insertBefore(matchingEmailsError, emailInput1);
+        hasError = true;
+    }else{
+        matchingEmailsError.remove();
+    }
+    return hasError;
+}
+
+//Check that start date is a day ahead
+function startDateProperDayChecker(startDateEle){
+    let hasError = false;
+    let chosenDate = new Date(startDateEle.value);
+    let currentDate = new Date();
+    if(currentDate.getTime() >= chosenDate.getTime()){
+        removeElements(emptyStartDate, emptyDurationError);
+        contactForm.insertBefore(incorrectStartDate, document.getElementById('start-and-end-date'));
+        hasError = true;
+    }
+    if(!hasError && chosenDate.getDay() <= currentDate.getDay()){
+        removeElements(emptyStartDate, emptyDurationError);
+        contactForm.insertBefore(incorrectStartDate, document.getElementById('start-and-end-date'));
+        hasError = true;
+    }
+    if(!hasError) incorrectStartDate.remove();
+    return hasError;
+}
+
+//Check that duration isn't empty
+function emptyDurationChecker(){
+    let isError = false;
+    if(!contactForm.endDate.value){
+        removeElements(incorrectStartDate, emptyStartDate);
+        contactForm.insertBefore(emptyDurationError, document.getElementById('start-and-end-date'));
+        isError = true;
+    }else{
+        emptyDurationError.remove();
+    }
+    return isError;
+}
+
+//Do the proper checks for the phone number input
+function phoneInputChecker(){
+    let isError = false;
+    //Create the error where the phone number is empty.
+    if(contactMethodOption === 'phone' && !contactForm.phoneNumber.value){
+        contactForm.insertBefore(emptyPhoneNumber, contactForm.phoneNumber);
+        isError = true;
+    }else{
+        emptyPhoneNumber.remove();
+    }
+    //Create the error where the phone number isn't in the format of an actual phone number
+    let matchPhone = contactForm.phoneNumber.value.match(/([0-9]|-)+/g);
+    if(!isError && contactMethodOption === 'phone' && !matchPhone){
+        contactForm.insertBefore(incorrectPhoneNumberError, contactForm.phoneNumber);
+        isError = true;
+    }else{
+        incorrectPhoneNumberError.remove();
+    }
+    return isError;
+}
+
+/*Remove elements that need to be removed to make way for new element. Unlike the other functions in this section, this is essentially
+just a util function. */
+function removeElements(){
+    let argumentsArray = Array.prototype.slice.call(arguments);
+    for(let i = 0; i < argumentsArray.length; i++){
+        let ele = argumentsArray[i];
+        ele.remove();
+    }
 }
 
 /*When we click on the submit button which isn't necessarily the same as submitting the form. Hence, this is where we will be 
 doing error checking.
 */
 contactForm.submit.onclick = function(){
-    if(!hasSelectedContactMethod){
+    let hasBeenError = false;
+    //Display error if they haven't entered a start date
+    if(!contactForm.startDate.value){
+        removeElements(incorrectStartDate, emptyDurationError);
+        contactForm.insertBefore(emptyStartDate, document.getElementById('start-and-end-date'));
+        hasBeenError = true;
+    }else{
+        emptyStartDate.remove();
+    }
+
+    //Display an error if start date isn't a day ahead
+    if(!hasBeenError){
+        hasBeenError = startDateProperDayChecker(contactForm.startDate);
+    }
+
+    //Display an error message if there is no duration
+    if(!hasBeenError){
+        hasBeenError = emptyDurationChecker();
+    }
+    
+    //Display error if they haven't entered a forename
+    if(!contactForm.forename.value){
+        contactForm.insertBefore(emptyForenameError, contactForm.forename);
+        hasBeenError = true;
+    }else{
+        emptyForenameError.remove();
+    }
+
+    //Display error if they haven't chosen a contact method
+    if(contactMethodOption === 'none'){
         contactForm.insertBefore(contactMethodError, document.getElementById('contactMethodLabel'));
+        hasBeenError = true;
     }else{
         contactMethodError.remove();
+    }
+    /*Do the proper email checking for both emails. Note, inside the function, we automatically check to see that the 'contactMethodOption'
+    is set to the correct value, that is 'string', which is why we aren't checking for that outside of the function here.*/
+    hasBeenError = emailInputsErrorChecking(contactForm.email, firstEmailEmptyError, secondEmailEmptyError);
+    hasBeenError = emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError);
+    //Display error if both emails don't match
+    if(!hasBeenError && contactMethodOption === 'email'){
+        hasBeenError = matchingEmailsChecker(contactForm.email, contactForm.confirmEmail);
+    }
+
+    hasBeenError = phoneInputChecker();
+
+    //Check to see that there is actually a message
+    if(!contactForm.extraComments.value){
+        contactForm.insertBefore(emptyMessageError, document.getElementById('extra-comments-label'));
+        hasBeenError = true;
+    }else{
+        emptyMessageError.remove();
     }
 }
 
 contactForm.onsubmit = function(e){
     e.preventDefault();
-    console.log('SUBMIT');
 }
