@@ -75,7 +75,7 @@ const sortOutMainMenu = (function() {
         counter++;
         const offsetTop = document.body.getBoundingClientRect().top;
         if(window.innerWidth < 992){
-            if(counter < 4 || isWindowResizing){
+            if(counter < 4 || isWindowResizing || contactModalInAnim){
                 offsetTopStore = offsetTop;
                 return;
             }
@@ -397,7 +397,7 @@ const thirdEmailEmptyError = generateErrorMessages('Cannot have an empty email')
 //Create the error informing that emails need to match
 const matchingEmailsError = generateErrorMessages('Emails need to match');
 //Create the error informing that the phone input is empty
-const emptyPhoneNumber = generateErrorMessages('Cannot have an empty phone number');
+const emptyPhoneNumberError = generateErrorMessages('Cannot have an empty phone number');
 //Create the error informing that the phone input doesn't represent an actual phone number
 const incorrectPhoneNumberError = generateErrorMessages('This input can only take in numbers and hyphens');
 //Create the error infroming that the message is empty
@@ -416,9 +416,17 @@ contactForm.contactMethod.onchange = function(e){
     contactMethodOption = selectedOption;
 }
 
-//Do the standard error checking for the 2 email inputs
-function emailInputsErrorChecking(emailInput, emailError1, emailError2){
+/**
+ * Do the standard error checking for the 2 email inputs
+ * @param {*} currError Boolean Is the current error state from the main error checking function. If this is already set to be true, then
+   since our main error Boolean will be set to be the value of a local error Boolean from this function, to not mess things up, if our
+   main error Boolean, as determined by this parameter, is already set to be true, then we want to set the local error Boolean to be true
+   as well.
+ * @returns Boolean
+ */
+function emailInputsErrorChecking(emailInput, emailError1, emailError2, currError){
     let firstError = false;
+    if(currError) firstError = true;
     //Display error if they have chosen email as their contact method but haven't entered anything for the first email input.
     if(contactMethodOption === 'email' && emailInput.value === ''){
         contactForm.insertBefore(emailError1, emailInput);
@@ -481,15 +489,23 @@ function emptyDurationChecker(){
     return isError;
 }
 
-//Do the proper checks for the phone number input
-function phoneInputChecker(){
+/**
+ * Do the proper checks for the phone number input
+ * @param currError Boolean Is the current error state from the main error checking function. If this is already set to be true, then
+   since our main error Boolean will be set to be the value of a local error Boolean from this function, to not mess things up, if our
+   main error Boolean, as determined by this parameter, is already set to be true, then we want to set the local error Boolean to be true
+   as well.
+ * @returns Boolean
+ */
+function phoneInputChecker(currError){
     let isError = false;
+    if(currError) isError = true;
     //Create the error where the phone number is empty.
     if(contactMethodOption === 'phone' && !contactForm.phoneNumber.value){
-        contactForm.insertBefore(emptyPhoneNumber, contactForm.phoneNumber);
+        contactForm.insertBefore(emptyPhoneNumberError, contactForm.phoneNumber);
         isError = true;
     }else{
-        emptyPhoneNumber.remove();
+        emptyPhoneNumberError.remove();
     }
     //Create the error where the phone number isn't in the format of an actual phone number
     let matchPhone = contactForm.phoneNumber.value.match(/([0-9]|-)+/g);
@@ -555,14 +571,14 @@ contactForm.submit.onclick = function(){
     }
     /*Do the proper email checking for both emails. Note, inside the function, we automatically check to see that the 'contactMethodOption'
     is set to the correct value, that is 'string', which is why we aren't checking for that outside of the function here.*/
-    hasBeenError = emailInputsErrorChecking(contactForm.email, firstEmailEmptyError, secondEmailEmptyError);
-    hasBeenError = emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError);
+    hasBeenError = emailInputsErrorChecking(contactForm.email, firstEmailEmptyError, secondEmailEmptyError, hasBeenError);
+    hasBeenError = emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError, hasBeenError);
     //Display error if both emails don't match
     if(!hasBeenError && contactMethodOption === 'email'){
         hasBeenError = matchingEmailsChecker(contactForm.email, contactForm.confirmEmail);
     }
 
-    hasBeenError = phoneInputChecker();
+    hasBeenError = phoneInputChecker(hasBeenError);
 
     //Check to see that there is actually a message
     if(!contactForm.extraComments.value){
@@ -594,16 +610,27 @@ function createContactModalEle(){
     return contactModalEle;
 }
 
-/* The event handler for when the exit btn of the contact modal is clicked on. When this happens, we want this function to close down
-the associated contact modal */
+/**
+ * The event handler for when the exit btn of the contact modal is clicked on. When this happens, we want this function to close down
+   the associated contact modal.
+ * @var contactModalInAnim Boolean If our contact modal is in mid animation, then this Boolean will prevent us from closing our modal 
+   until it has finished animating.
+ * @returns void
+ */
+let contactModalInAnim = false;
 function closeContactModal(){
+    //If our contact modal is already animating, then we don't want to be able to close it
+    if(contactModalInAnim) return;
 
     //Add the ability to scroll back to our page since our contact modal should now be closed.
     document.body.parentElement.style.overflow = '';
-
+    /* Get access to the actual <section> element that serves as the root element for our entire modal */
     const contactModalEle = document.getElementById('contact-modal');
     if(contactModalEle === undefined) return;
-    contactModalEle.remove();
+
+    /* Get access to the main part of the contact modal so that we can animate it */
+    const contactModalMainEle = document.getElementById('contact-modal__main');
+    animateMainModalElement(contactModalMainEle, 'up', contactModalEle);
 }
 
 /* Used when creating the contact modal. If input is empty, then output 'N/A'. If it isn't, then output the actual contents of the 
@@ -617,6 +644,52 @@ function handleContactModalEmptyInput(inputEleValue){
 }
 
 /**
+ * Animate the main part of the contact modal element. That is, animate it opening and closing.
+ * @param {'down','up'} direction Configures how we are animating the main part of our contact modal. That is, whether we are going to
+   animate it either up or down.
+   @param contactModalMainEle The main element from the contact modal that is actually going to be animated.
+   @param contactModalEle Only used for the 'up' animation. Used to remove the contact modal completely from the screen when the 'up'
+   animation is over.
+ * @returns void
+ */
+function animateMainModalElement(contactModalMainEle, direction, contactModalEle){
+    //Set the 'contactModalInAnim' Boolean to its appropriate value once the animation is over
+    function animationIsComplete(){
+        contactModalInAnim = false;
+    };
+
+    /* Calculate the height by which we should offset the top of our contact modal main section by. This offset will be done in pixels
+    and by prefacing the output of this calculation with a minus. This is done so that if the main part of our contact modal
+    starts from this offset, then it will be just off the top edge of the screen, relative to the size of the screen, and ready to 
+    animate down.*/
+    let animHeight = contactModalMainEle.offsetHeight+contactModalMainEle.offsetTop;
+
+    if(direction === 'down'){
+        contactModalInAnim = true;
+        gsap.from(contactModalMainEle, {
+            y: '-'+animHeight+'px',
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+            onComplete: animationIsComplete
+        });
+        return;
+    }
+    if(direction === 'up' && contactModalEle !== undefined){
+        contactModalInAnim = true;
+        gsap.to(contactModalMainEle, {
+            y: '-'+animHeight+'px',
+            duration: 0.6,
+            ease: 'back.in(1.7)',
+            onComplete: function(){
+                contactModalInAnim = false;
+                contactModalEle.remove();
+            }
+        });
+        return;
+    }
+}
+
+/**
  * Since the form has been submitted without any errors, use this function to add the confirmation modal to our page, summarising
    the users form input and allowing them to accept it for the final time.
  * @returns void
@@ -624,7 +697,7 @@ function handleContactModalEmptyInput(inputEleValue){
 function insertContactModal(){
     const contactModalEle = createContactModalEle();
 
-    let contactModalEleString = '<div class="contact-modal__main"> \
+    let contactModalEleString = '<div class="contact-modal__main" id="contact-modal__main"> \
     <div class="contact-modal__exit-btn" id="contact-modal__exit-btn">X</div> \
     <h1 class="title contact-modal__title">Confirm</h1> \
     <div class="underline contact-modal__title-underline"></div> \
@@ -672,4 +745,8 @@ function insertContactModal(){
     /* Since our modal is now open, we will now remove scroll from the main page, only to add it back again once our modal 
     is closed. */
     document.body.parentElement.style.overflow = 'hidden';
+
+    /* Get access to the main part of the contact modal so that we can animate it */
+    const contactModalMainEle = document.getElementById('contact-modal__main');
+    animateMainModalElement(contactModalMainEle, 'down');
 }
