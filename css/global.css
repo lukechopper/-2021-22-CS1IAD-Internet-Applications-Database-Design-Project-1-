@@ -7,7 +7,7 @@
 }
 
 
-p, em{
+p, em, blockquote{
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-size: 1.3rem;
 }
@@ -172,7 +172,7 @@ button, input, select, textarea {
 }
 
 @media (max-width: 575px){
-    p, em{
+    p, em, blockquote{
         font-size: 1.1rem;
     }
     .main-header__list{

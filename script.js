@@ -147,7 +147,13 @@ function animateSmallerMainHeader(type, headerHeight, duration){
    But, here, it is called directly by these event listeners.
  */
 addEventListener('scroll', sortOutMainMenu);
-addEventListener('load', sortOutMainMenu);
+/* Whilst the 'load' event handler does what the above comment said it would do, it is also calling the 
+'checkURLFragmentOnInitialPageLoad' method so that, with a URL fragment set, we can immediately jump to the specific part of the 
+page that we are meant to be focused on. */
+addEventListener('load', function(){
+    sortOutMainMenu();
+    checkURLFragmentOnInitialPageLoad();
+});
 /**
  * The function that is made to be the callback of the 'resize' event listener. Is used to resolve errors relating to animations, 
    styling, etc, hence why it is called whenever we resize our browser: so that when the incumbent media query changes, we can
@@ -325,24 +331,35 @@ const aboutEle = document.getElementById('about');
 //Get access to the section marking the start of the 'Projects' option in our nav bar.
 const projectsEle = document.getElementById('project');
 //Get access to the section marking the start of the 'Contact Me' option in our nav bar.
-const contactMeEle = document.getElementById('contacts');
+const contactMeEle = document.getElementById('contact-me');
 //Get access to our main nav options. I.e., the things in our nav bar that we click on.
 const mainHeaderOptions = document.getElementsByClassName('main-header__options');
 //Put the start of each section (where we will scroll to when we click on the relevant nav bar options) in an Array.
 const startSectionsArray = [aboutEle, projectsEle, contactMeEle];
 //Put the offset of each section in an Array. This is so we can account for the margin of each section.
 const offsetStartSections = [120, 100, 100];
+/**
+ * Either with an animation or without, scroll our window to the part of the page that we desire to go to.
+ * @param arrayIndex int The array index corresponding to the 'offsetStartSections' and 'startSectionsArray' arrays specifically.
+   Specifies which part of the page that we actually want to scroll to.
+ * @param {'smooth','auto'} behaviour Specifies whether we want to scroll smoothly, with an animation, or whether we want to suddenly
+   jump to the desired part of our page.
+ * @returns void
+ */
+function scrollToPartOfPage(arrayIndex, behavior){
+    const startSection = startSectionsArray[arrayIndex];
+    const offset = offsetStartSections[arrayIndex];
+    const offsetNum = startSection.offsetTop - offset;
+        window.scroll({
+            top: offsetNum,
+            behavior
+        });
+}
 //Loop through our main nav options so that when we click on them, they can actually take us to somewhere on the page.
 for(let i = 0; i < mainHeaderOptions.length; i++){
     const options = mainHeaderOptions[i];
     options.onclick = function(){
-        const startSection = startSectionsArray[i];
-        const offset = offsetStartSections[i];
-        const offsetNum = startSection.offsetTop - offset;
-            window.scroll({
-                top: offsetNum,
-                behavior: 'smooth'
-            });
+        scrollToPartOfPage(i, 'smooth');
     }
 }
 //Get access to the icon on the left of the nav bar so that when we click on it, we can get it to take us to the main starting section.
@@ -351,14 +368,25 @@ const mainHeaderLeftIcon = document.getElementById('main-header__left-icon');
 const upChevron = document.getElementById('footer__chevron');
 //Create a function that will automatically scroll up to the top of the page. Will be applied as the 'onclick' event handler for elements.
 function scrollUpToHome(){
-    window.scroll({
-        top: startSectionsArray[0],
-        left: 0,
-        behavior: 'smooth'
-    });
+    scrollToPartOfPage(0, 'smooth');
 }
 mainHeaderLeftIcon.onclick = scrollUpToHome;
 upChevron.onclick = scrollUpToHome;
+
+/**
+ * As soon as our page loads, we want to check our URL fragment to see which part of the page we should automatically start on.
+ * @returns void
+ */
+function checkURLFragmentOnInitialPageLoad(){
+    let urlFragment = location.hash;
+    if(urlFragment === '#home'){
+        scrollToPartOfPage(0, 'auto');
+    }else if(urlFragment === '#projects'){
+        scrollToPartOfPage(1, 'auto');
+    }else if(urlFragment === '#contact'){
+        scrollToPartOfPage(2, 'auto');
+    }
+}
 
 //END OF OPTIONS SECTION
 //
@@ -385,7 +413,7 @@ const emptyStartDate = generateErrorMessages('Cannot have an empty start date');
 // Start date needs to be at least one day ahead error
 const incorrectStartDate = generateErrorMessages('Start date needs to be at least one day in the future');
 //Create the error message where they haven't entered a duration.
-const emptyDurationError = generateErrorMessages('Cannot have an empty duration')
+const emptyDurationError = generateErrorMessages('Cannot have an empty duration');
 //Create the error message where they haven't entered a forename.
 const emptyForenameError = generateErrorMessages('Cannot have an empty forename');
 //Create the error message where the user hasn't chosen a contact method.

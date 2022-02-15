@@ -326,6 +326,8 @@
     border: none;
     background-color: lightgray;
     width: 100%;
+    max-width: 500px;
+    max-height: 200px;
 }
 .contact__form-submit{
     margin-top: 20px;
