@@ -100,6 +100,7 @@ button, input, select, textarea {
     font-size: 1.3rem;
     padding: 5px 20px;
     transition: color 0.25s,background-color 0.25s;
+    cursor: pointer;
 }
 
 .main-header__options:hover{

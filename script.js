@@ -95,7 +95,7 @@ const sortOutMainMenu = (function() {
  */
 function animateExpandedMainHeader(type, counter = 5, duration = 0.25){
     if(type==='contract'){
-        gsap.timeline({defaults: {duration: counter>1 ? duration : 0, ease: 'power1'}})
+        gsap.timeline({defaults: {duration: counter>2 ? duration : 0, ease: 'power1'}})
                 .to(mainHeader.getElementsByClassName('main-header__title')[0], {
                     fontSize: '2rem'
                 }, 0)
@@ -338,6 +338,8 @@ const mainHeaderOptions = document.getElementsByClassName('main-header__options'
 const startSectionsArray = [aboutEle, projectsEle, contactMeEle];
 //Put the offset of each section in an Array. This is so we can account for the margin of each section.
 const offsetStartSections = [120, 100, 100];
+//Store the URL fragments related to each page secton in an array.
+const urlFragments = ['home','projects','contact'];
 /**
  * Either with an animation or without, scroll our window to the part of the page that we desire to go to.
  * @param arrayIndex int The array index corresponding to the 'offsetStartSections' and 'startSectionsArray' arrays specifically.
@@ -347,6 +349,8 @@ const offsetStartSections = [120, 100, 100];
  * @returns void
  */
 function scrollToPartOfPage(arrayIndex, behavior){
+    const urlFragment = urlFragments[arrayIndex];
+    location.hash = urlFragment;
     const startSection = startSectionsArray[arrayIndex];
     const offset = offsetStartSections[arrayIndex];
     const offsetNum = startSection.offsetTop - offset;
@@ -446,17 +450,15 @@ contactForm.contactMethod.onchange = function(e){
 
 /**
  * Do the standard error checking for the 2 email inputs
- * @param {*} currError Boolean Is the current error state from the main error checking function. If this is already set to be true, then
-   since our main error Boolean will be set to be the value of a local error Boolean from this function, to not mess things up, if our
-   main error Boolean, as determined by this parameter, is already set to be true, then we want to set the local error Boolean to be true
-   as well.
+ * @param {Boolean} shouldEmailCheck We should check our email inputs unless we have set phone to be our preferred contact method
+   and have both email inputs set to be empty, or if we just have our preferred contacts set to none. If this is the case, 
+   then this Boolean will inform us as such, allowing us to not run the checks as a result.
  * @returns Boolean
  */
-function emailInputsErrorChecking(emailInput, emailError1, emailError2, currError){
+function emailInputsErrorChecking(emailInput, emailError1, emailError2, shouldEmailCheck){
     let firstError = false;
-    if(currError) firstError = true;
     //Display error if they have chosen email as their contact method but haven't entered anything for the first email input.
-    if(contactMethodOption === 'email' && emailInput.value === ''){
+    if(emailInput.value === '' && shouldEmailCheck){
         contactForm.insertBefore(emailError1, emailInput);
         firstError = true;
     }else{
@@ -464,7 +466,7 @@ function emailInputsErrorChecking(emailInput, emailError1, emailError2, currErro
     }
     //Display error if they haven't entered a proper email.
     let emailMatch = emailInput.value.match(/([a-z]|[A-Z]|[0-9])+@([a-z]|[A-Z]|[0-9])+\.([a-z]|[A-Z]|[0-9])+/g);
-    if(!emailMatch && !firstError && contactMethodOption === 'email'){
+    if(!emailMatch && !firstError && shouldEmailCheck){
         contactForm.insertBefore(emailError2, emailInput);
         firstError = true;
     }else{
@@ -473,10 +475,19 @@ function emailInputsErrorChecking(emailInput, emailError1, emailError2, currErro
     return firstError;
 }
 
-//Check that emails need to match
-function matchingEmailsChecker(emailInput1, emailInput2){
+/**
+ * Check that emails need to match.
+ * @param currError Boolean Is the current error state from the main error checking function. If this is already set to be true, then
+   since our main error Boolean will be set to be the value of a local error Boolean from this function, to not mess things up, if our
+   main error Boolean, as determined by this parameter, is already set to be true, then we want to set the local error Boolean to be true
+   as well.
+ * @param hasEmailError Boolean Checks to see whether there has already been an error associated with any of the email inputs prior to
+   this function being called. If there has, then we don't want to add an error message here.
+ * @returns Boolean
+ */
+function matchingEmailsChecker(emailInput1, emailInput2, hasEmailError){
     let hasError = false;
-    if(emailInput1.value !== emailInput2.value){
+    if(emailInput1.value !== emailInput2.value && !hasEmailError){
         contactForm.insertBefore(matchingEmailsError, emailInput1);
         hasError = true;
     }else{
@@ -519,17 +530,15 @@ function emptyDurationChecker(){
 
 /**
  * Do the proper checks for the phone number input
- * @param currError Boolean Is the current error state from the main error checking function. If this is already set to be true, then
-   since our main error Boolean will be set to be the value of a local error Boolean from this function, to not mess things up, if our
-   main error Boolean, as determined by this parameter, is already set to be true, then we want to set the local error Boolean to be true
-   as well.
+ * @param {Boolean} shouldPhoneCheck We should check our phone input unless we have set our preferred contact method to be email
+   and have not entered in anything for our phone input, or if we just have our preferred contacts set to none. If this is the case, 
+   then this Boolean will inform us as such, allowing us to not run the checks as a result.
  * @returns Boolean
  */
-function phoneInputChecker(currError){
+function phoneInputChecker(shouldPhoneCheck){
     let isError = false;
-    if(currError) isError = true;
     //Create the error where the phone number is empty.
-    if(contactMethodOption === 'phone' && !contactForm.phoneNumber.value){
+    if(!contactForm.phoneNumber.value && shouldPhoneCheck){
         contactForm.insertBefore(emptyPhoneNumberError, contactForm.phoneNumber);
         isError = true;
     }else{
@@ -537,7 +546,7 @@ function phoneInputChecker(currError){
     }
     //Create the error where the phone number isn't in the format of an actual phone number
     let matchPhone = contactForm.phoneNumber.value.match(/([0-9]|-)+/g);
-    if(!isError && contactMethodOption === 'phone' && !matchPhone){
+    if(!isError && !matchPhone && shouldPhoneCheck){
         contactForm.insertBefore(incorrectPhoneNumberError, contactForm.phoneNumber);
         isError = true;
     }else{
@@ -597,16 +606,47 @@ contactForm.submit.onclick = function(){
     }else{
         contactMethodError.remove();
     }
+    /* Get the record of whether there has been an email error or not. If there has, then we will set our main error Boolean, 'hasBeenError', to be true
+    and we will also be able to check to see whether the emails match each other or not. But, thanks to this Boolean, we will only do 
+    that if there isn't an individual problem with any of the email inputs first and foremost. */
+    let emailError = false;
+    /* Check the individual email inputs for errors unless we have set our preferred contact method to be phone and have left both of
+    our email inputs to be empty, or if we just haven't set a preferred contact method yet */
+    let shouldEmailCheck = true;
+    if(contactMethodOption === 'phone' && contactForm.email.value === '' && contactForm.confirmEmail.value === '' || contactMethodOption === 'none') shouldEmailCheck = false;
+
     /*Do the proper email checking for both emails. Note, inside the function, we automatically check to see that the 'contactMethodOption'
     is set to the correct value, that is 'string', which is why we aren't checking for that outside of the function here.*/
-    hasBeenError = emailInputsErrorChecking(contactForm.email, firstEmailEmptyError, secondEmailEmptyError, hasBeenError);
-    hasBeenError = emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError, hasBeenError);
-    //Display error if both emails don't match
-    if(!hasBeenError && contactMethodOption === 'email'){
-        hasBeenError = matchingEmailsChecker(contactForm.email, contactForm.confirmEmail);
+    emailError = emailInputsErrorChecking(contactForm.email, firstEmailEmptyError, secondEmailEmptyError, shouldEmailCheck);
+    /* If the previous email input did have an error, then run the checker on the next email input, automatically making it ignore whatever
+    errors this latter email input may have, and forcing it to just clear all its errors. If this isn't the case, then just run the error
+    checker function like normal. */
+    if(emailError){
+        emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError, false);
+    }else{
+        emailError = emailInputsErrorChecking(contactForm.confirmEmail, thirdEmailEmptyError, fourthEmailEmptyError, shouldEmailCheck);
     }
+    
+    
+    if(emailError) hasBeenError = true;
 
-    hasBeenError = phoneInputChecker(hasBeenError);
+
+    //Display error if both emails don't match
+    let matchingEmailsError = false;
+    matchingEmailsError = matchingEmailsChecker(contactForm.email, contactForm.confirmEmail, emailError);
+    if(matchingEmailsError) hasBeenError = true;
+
+    /* See if there was a phone error or not. If there was, then we will set our main 'hasError' Boolean to be true. If there wasn't, then
+    we won't do anything. */
+    let phoneError = false;
+    /* Check the phone input errors unless we have set our preferred contact method to be email and have left our phone input completely
+    empty, or if we just haven't set a preferred contact method yet */
+    let shouldPhoneCheck = true;
+    if(contactMethodOption === 'email' && contactForm.phoneNumber.value === '' || contactMethodOption === 'none') shouldPhoneCheck = false;
+    
+    phoneError = phoneInputChecker(shouldPhoneCheck);
+    
+    if(phoneError) hasBeenError = true;
 
     //Check to see that there is actually a message
     if(!contactForm.extraComments.value){
@@ -615,6 +655,7 @@ contactForm.submit.onclick = function(){
     }else{
         emptyMessageError.remove();
     }
+
 
     //Since there hasn't been any errors up to this point, insert the confirmation modal now.
     if(!hasBeenError){
@@ -763,12 +804,19 @@ function insertContactModal(){
     contactModalEle.innerHTML = contactModalEleString;
     mainEle.appendChild(contactModalEle);
 
-    /* Add the appropriate event listener to the exit btn on the contact form. That is, when we click on this, we want to close
-    down our form. */
+    /* Add the appropriate event handlers to the exit btn and the send btn of our contact form. In other words, by adding the event 
+    handlers, make our contact form close when we click on these things. */
     const exitBtn = document.getElementById('contact-modal__exit-btn');
     exitBtn.onclick = closeContactModal;
     const sendBtn = document.getElementById('contact-modal__send-btn');
     sendBtn.onclick = closeContactModal;
+    /* Make it so that we close the exit modal when we click on the background (transparent gray part) of the contact modal.
+    Due to event propogation, we need to be extra careful that this is the element that we are actually clicking on here.*/
+    contactModalEle.onclick = function(e){
+        const ele = e.target;
+        if(ele.getAttribute('id') !== 'contact-modal') return;
+        closeContactModal();
+    }
 
     /* Since our modal is now open, we will now remove scroll from the main page, only to add it back again once our modal 
     is closed. */
