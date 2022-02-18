@@ -222,7 +222,7 @@ const windowResize = (function(){
             then, based on how our media queries are changing, we want to reposition it into the right place. */
             repositionEmptyDurationError('expand');
         }
-        if(windowState !== 'smallest' && window.innerWidth < 576){ //Going anything larger than smallest to smallest
+        if(windowState !== 'smallest' && window.innerWidth < 576){ //Going from anything larger than smallest to smallest
             animateHamburgerOpenSmallLarge('small');
             mainHeader.getElementsByClassName('main-header__left-section')[0].style.height = '';
             mainHeader.getElementsByClassName('main-header__title')[0].style.fontSize = '';
@@ -326,6 +326,7 @@ function animateHeaderHamburger(type, duration){
 //
 //
 //
+
 
 //START OF OPTIONS SECTION
 //
@@ -688,7 +689,7 @@ contactForm.onsubmit = function(e){
  */
 function repositionEmptyDurationError(type){
     const durEle = document.getElementById('empty-duration-error');
-    if(durEle === undefined) return;
+    if(!durEle) return;
     if(type === 'expand'){
         durEle.remove();
         contactForm.insertBefore(durEle, document.getElementById('start-and-end-date'));
@@ -739,7 +740,7 @@ function closeContactModal(){
     document.body.parentElement.style.overflow = '';
     /* Get access to the actual <section> element that serves as the root element for our entire modal */
     const contactModalEle = document.getElementById('contact-modal');
-    if(contactModalEle === undefined) return;
+    if(!contactModalEle) return;
 
     /* Get access to the main part of the contact modal so that we can animate it */
     const contactModalMainEle = document.getElementById('contact-modal__main');
@@ -787,7 +788,7 @@ function animateMainModalElement(contactModalMainEle, direction, contactModalEle
         });
         return;
     }
-    if(direction === 'up' && contactModalEle !== undefined){
+    if(direction === 'up' && contactModalEle){
         contactModalInAnim = true;
         gsap.to(contactModalMainEle, {
             y: '-'+animHeight+'px',
