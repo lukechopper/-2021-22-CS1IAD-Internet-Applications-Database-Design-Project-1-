@@ -3,6 +3,11 @@
 //
 //
 
+/* GLOBAL Cubic Bezier easing values, used for the transition. */
+const easeInOutSine = 'cubic-bezier(0.37, 0, 0.63, 1)';
+const easeOutBack = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const easeInBack = 'cubic-bezier(0.36, 0, 0.66, -0.56)';
+
 /**
  * The actual <header> element of the document.
  */
@@ -95,29 +100,23 @@ const sortOutMainMenu = (function() {
  */
 function animateExpandedMainHeader(type, counter = 5, duration = 0.25){
     if(type==='contract'){
-        gsap.timeline({defaults: {duration: counter>2 ? duration : 0, ease: 'power1'}})
-                .to(mainHeader.getElementsByClassName('main-header__title')[0], {
-                    fontSize: '2rem'
-                }, 0)
-                .to(mainHeader.getElementsByClassName('main-header__sub_title')[0], {
-                    opacity: 0
-                }, 0)
-                .to(mainHeader.getElementsByClassName('main-header__left-section')[0], {
-                    height: '43px'
-                }, 0);
+        let cDuration = 0;
+        if(counter > 2) cDuration = duration;
+        transitionElement(mainHeader.getElementsByClassName('main-header__title')[0],cDuration,easeInOutSine,
+        [['fontSize','2rem']]);
+        transitionElement(mainHeader.getElementsByClassName('main-header__sub_title')[0],cDuration,easeInOutSine,
+        [['opacity','0']]);
+        transitionElement(mainHeader.getElementsByClassName('main-header__left-section')[0],cDuration,easeInOutSine,
+        [['height','43px']]);
         return;
     }
     if(type==='expand'){
-        gsap.timeline({defaults: {duration: duration, ease: 'power1'}})
-                .to(mainHeader.getElementsByClassName('main-header__title')[0], {
-                    fontSize: '2.5rem'
-                }, 0)
-                .to(mainHeader.getElementsByClassName('main-header__sub_title')[0], {
-                    opacity: 1
-                }, 0)
-                .to(mainHeader.getElementsByClassName('main-header__left-section')[0], {
-                    height: '69px'
-                }, 0);
+        transitionElement(mainHeader.getElementsByClassName('main-header__title')[0],duration,easeInOutSine,
+        [['fontSize','2.5rem']]);
+        transitionElement(mainHeader.getElementsByClassName('main-header__sub_title')[0],duration,easeInOutSine,
+        [['opacity','1']]);
+        transitionElement(mainHeader.getElementsByClassName('main-header__left-section')[0],duration,easeInOutSine,
+        [['height','69px']]);
         return;
     }
 }
@@ -130,12 +129,12 @@ function animateExpandedMainHeader(type, counter = 5, duration = 0.25){
  */
 function animateSmallerMainHeader(type, headerHeight, duration){
     if(type==='float_off'){
-        gsap.to(mainHeader, {duration, top: '-'+headerHeight+'px',ease:'power1'});
+        transitionElement(mainHeader,duration,easeInOutSine,[['top','-'+headerHeight+'px']]);
         isFloatedOfScreen = true;
         return;
     }
     if(type==='float_in'){
-        gsap.to(mainHeader, {duration, top: '0px',ease:'power1'});
+        transitionElement(mainHeader,duration,easeInOutSine,[['top','0px']]);
         isFloatedOfScreen = false;
     }
 }
@@ -253,17 +252,17 @@ const configureHamburgerHeaderList = (function(){
         if(isOpen){
             if(window.innerWidth < 576){
                 animateHeaderHamburger('open_small', 0.25);
-                gsap.to(headerList, {height: '195px', duration: 0.25, ease: 'power1', onComplete: function(){
+                transitionElement(headerList,0.25,easeInOutSine,[['height','195px']], function(){
                     headerList.classList.add('main-header__list--hamburger-small-open');
-                }});
+                });
                 return;
             }
             animateHeaderHamburger('open_large', 0.25);
-            gsap.to(headerList, {height: '224px', duration: 0.25, ease: 'power1'});
+            transitionElement(headerList,0.25,easeInOutSine,[['height','224px']]);
             return;
         }
         animateHeaderHamburger('close', 0.25);
-        gsap.to(headerList, {height: '0px', duration: 0.25, ease: 'power1'});
+        transitionElement(headerList,0.25,easeInOutSine,[['height','0px']]);
     }
 })();
 /**
@@ -280,47 +279,86 @@ headerHamburger.onclick = configureHamburgerHeaderList;
  */
 function animateHeaderHamburger(type, duration){
     if(type === 'open_small'){
-        gsap.timeline({defaults: {duration: duration, ease: 'power1'}})
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0], {
-                    transform: 'rotate(-45deg) translate(-10px, 16px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0], {
-                    transform: 'rotate(45deg) translate(-8px, -16px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0], {
-                    opacity: '0'
-                }, 0);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0],duration,easeInOutSine,
+        [['transform','rotate(-45deg) translate(-10px, 16px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0],duration,easeInOutSine,
+        [['transform','rotate(45deg) translate(-8px, -16px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0],duration,easeInOutSine,
+        [['opacity','0']]);
         headerHamburger.setAttribute('open', 'true');
         return;
     }
     if(type === 'open_large'){
-        gsap.timeline({defaults: {duration: duration, ease: 'power1'}})
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0], {
-                    transform: 'rotate(-45deg) translate(-15px, 16px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0], {
-                    transform: 'rotate(45deg) translate(-15px, -16px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0], {
-                    opacity: '0'
-                }, 0);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0],duration,easeInOutSine,
+        [['transform','rotate(-45deg) translate(-15px, 16px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0],duration,easeInOutSine,
+        [['transform','rotate(45deg) translate(-15px, -16px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0],duration,easeInOutSine,
+        [['opacity','0']]);
         headerHamburger.setAttribute('open', 'true');
         return;
     }
     if(type === 'close'){
-        gsap.timeline({defaults: {duration: duration, ease: 'power1'}})
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0], {
-                    transform: 'rotate(0deg) translate(-0px, 0px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0], {
-                    transform: 'rotate(0deg) translate(0px, -0px)'
-                }, 0)
-                .to(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0], {
-                    opacity: '1'
-                }, 0);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_top')[0],duration,easeInOutSine,
+        [['transform','rotate(0deg) translate(-0px, 0px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_bottom')[0],duration,easeInOutSine,
+        [['transform','rotate(0deg) translate(0px, -0px)']]);
+        transitionElement(headerHamburger.getElementsByClassName('main-header__hamburger_center')[0],duration,easeInOutSine,
+        [['opacity','1']]);
                 headerHamburger.setAttribute('open', '');
         return;
     }
+}
+
+
+/**
+ * The animation function used for all of our animations. Is essentially a gsap alternative, although is far more primitive, obviously.
+ * @param {HTMLDOMElement} element The element that we want to animate.
+ * @param {number} duration How long our transition should be.
+ * @param {string} ease Our transitions ease. Note, since we are using CSS transitions to create our animations, in order for these eases to work,
+   the values of this ease parameter will need to correspond to actual CSS ease values.
+ * @param {[[string,string]]} keyVales Defines our animation. Is an Array of Array's, the latter of the 2 must contain 2 String values. The first
+   value will correspond to the property that we are targeting for animation, and the latter is the value that we want this property to end up with
+   by the time the animation is over.
+   @param {function} onComplete An optional callback function that we can activate upon the event of the animation finishing.
+ * @returns void
+ */
+function transitionElement(element, duration, ease, keyValues, onComplete){
+    const transEle = element;
+    transEle.style.transition = 'all '+duration+'s '+ease;
+    for(let i = 0; i < keyValues.length; i++){
+        const keyValue = keyValues[i];
+        transEle.style[keyValue[0]] = keyValue[1];
+    }
+    transEle.ontransitionend = function(){
+        transEle.style.transition = '';
+        if(onComplete){
+            onComplete();
+        }
+    }
+}
+
+/**
+ * Either add a <style> tag to the <head> of our HTMLDocument, or append further styles to it if this <style> tag already exists.
+ * @param {string} styles Written in proper CSS form, as a string, this is the actual styles that we want to insert into our <style> tag.
+ * @param {Boolean} overwrite If this is set to true, then we will replace an already existing <style> tag with a new one (so that there can only
+   be one <style> tag at a time), containing the same content as the old <style> tag plus any new content that we want to append to it. If it is set
+   to false, then we will simply add a <style> tag with some content to our <head>.
+ * @returns void
+ */
+function addToHeaderStyle(styles, overwrite){
+    const headEle = document.body.parentElement.childNodes[0];
+    let strContent = '';
+    const prevStyles = headEle.getElementsByTagName('style');
+    if(prevStyles.length){
+        if(overwrite){
+            prevStyles[0].innerHTML = strContent;
+        }
+        prevStyles[0].remove();
+    }
+    const styleTag = document.createElement('style');
+    styleTag.innerHTML = strContent+styles;
+    headEle.appendChild(styleTag);
 }
 //END OF THE MAIN HEADER SECTION
 //
@@ -514,7 +552,7 @@ function startDateProperDayChecker(startDateEle){
         contactForm.insertBefore(incorrectStartDate, document.getElementById('start-and-end-date'));
         hasError = true;
     }
-    if(!hasError && chosenDate.getDay() <= currentDate.getDay()){
+    if(!hasError && chosenDate.getDate() <= currentDate.getDate()){
         removeElements(emptyStartDate, emptyDurationError);
         contactForm.insertBefore(incorrectStartDate, document.getElementById('start-and-end-date'));
         hasError = true;
@@ -780,24 +818,21 @@ function animateMainModalElement(contactModalMainEle, direction, contactModalEle
 
     if(direction === 'down'){
         contactModalInAnim = true;
-        gsap.from(contactModalMainEle, {
-            y: '-'+animHeight+'px',
-            duration: 0.6,
-            ease: 'back.out(1.7)',
-            onComplete: animationIsComplete
-        });
+        addToHeaderStyle('.contact-modal__main{ \
+            transform: translateY(-'+animHeight+'px);'+'\
+        }', false);
+        /* Use setTimeout so that the styles applied above, necessary for the animation to even work, have time to actually be applied. Thus,
+        our animation can transition from the styles applied above to the ones applied here. */
+        setTimeout(() => {
+            transitionElement(contactModalMainEle,0.6,easeOutBack,[['transform','translateY(0px)']],animationIsComplete);
+        }, 0);
         return;
     }
     if(direction === 'up' && contactModalEle){
         contactModalInAnim = true;
-        gsap.to(contactModalMainEle, {
-            y: '-'+animHeight+'px',
-            duration: 0.6,
-            ease: 'back.in(1.7)',
-            onComplete: function(){
-                contactModalInAnim = false;
-                contactModalEle.remove();
-            }
+        transitionElement(contactModalMainEle,0.6,easeInBack,[['transform','translateY(-'+animHeight+'px)']],function(){
+            contactModalInAnim = false;
+            contactModalEle.remove();
         });
         return;
     }
