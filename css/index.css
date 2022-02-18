@@ -347,6 +347,9 @@
     margin-top: 20px;
     margin-bottom: -20px;
 }
+.contact__form-error.contact__form-error-duration-large{
+    margin-left: 238px;
+}
 @media (max-width: 575px){
     .contact__form-start-and-end-date{
         display: flex;

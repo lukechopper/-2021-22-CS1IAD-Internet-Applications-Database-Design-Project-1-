@@ -569,6 +569,7 @@ function emptyDurationChecker(){
         if(window.innerWidth < 576){
             document.getElementById('start-and-end-date').insertBefore(emptyDurationError, document.getElementById('contact__form-end-date'));
         }else{
+            emptyDurationError.classList.add('contact__form-error-duration-large');
             contactForm.insertBefore(emptyDurationError, document.getElementById('start-and-end-date'));
         }
         
@@ -730,11 +731,13 @@ function repositionEmptyDurationError(type){
     if(!durEle) return;
     if(type === 'expand'){
         durEle.remove();
+        durEle.classList.add('contact__form-error-duration-large');
         contactForm.insertBefore(durEle, document.getElementById('start-and-end-date'));
         return;
     }
     if(type === 'contract'){
         durEle.remove();
+        durEle.classList.remove('contact__form-error-duration-large');
         document.getElementById('start-and-end-date').insertBefore(durEle, document.getElementById('contact__form-end-date'));
         return;
     }
