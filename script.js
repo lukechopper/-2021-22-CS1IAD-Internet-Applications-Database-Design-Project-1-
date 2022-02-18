@@ -218,11 +218,17 @@ const windowResize = (function(){
                 animateSmallerMainHeader('float_off', mainHeader.clientHeight, 0);
             }
             animateHamburgerOpenSmallLarge('large');
+            /* Related to the contact form at the bottom of the page. If the empty duration error element is already present on the contact form, 
+            then, based on how our media queries are changing, we want to reposition it into the right place. */
+            repositionEmptyDurationError('expand');
         }
-        if(windowState !== 'smallest' && window.innerWidth < 576){ //Going smallest to anything larger than it.
+        if(windowState !== 'smallest' && window.innerWidth < 576){ //Going anything larger than smallest to smallest
             animateHamburgerOpenSmallLarge('small');
             mainHeader.getElementsByClassName('main-header__left-section')[0].style.height = '';
             mainHeader.getElementsByClassName('main-header__title')[0].style.fontSize = '';
+            /* Related to the contact form at the bottom of the page. If the empty duration error element is already present on the contact form, 
+            then, based on how our media queries are changing, we want to reposition it into the right place. */
+            repositionEmptyDurationError('contract');
         }
         setWindowState();
         setTimeout(function(){
@@ -337,7 +343,7 @@ const mainHeaderOptions = document.getElementsByClassName('main-header__options'
 //Put the start of each section (where we will scroll to when we click on the relevant nav bar options) in an Array.
 const startSectionsArray = [aboutEle, projectsEle, contactMeEle];
 //Put the offset of each section in an Array. This is so we can account for the margin of each section.
-const offsetStartSections = [120, 100, 100];
+const offsetStartSections = [140, 100, 100];
 //Store the URL fragments related to each page secton in an array.
 const urlFragments = ['home','projects','contact'];
 /**
@@ -406,9 +412,10 @@ function checkURLFragmentOnInitialPageLoad(){
 const contactForm = document.getElementById('contact__form');
 
 //The function that we will use to quickly generate error messages
-function generateErrorMessages(errorMsg){
+function generateErrorMessages(errorMsg, id=''){
     const ele = document.createElement('div');
     ele.classList.add('contact__form-error');
+    ele.setAttribute('id', id);
     ele.textContent = errorMsg;
     return ele;
 }
@@ -417,7 +424,7 @@ const emptyStartDate = generateErrorMessages('Cannot have an empty start date');
 // Start date needs to be at least one day ahead error
 const incorrectStartDate = generateErrorMessages('Start date needs to be at least one day in the future');
 //Create the error message where they haven't entered a duration.
-const emptyDurationError = generateErrorMessages('Cannot have an empty duration');
+const emptyDurationError = generateErrorMessages('Cannot have an empty duration', 'empty-duration-error');
 //Create the error message where they haven't entered a forename.
 const emptyForenameError = generateErrorMessages('Cannot have an empty forename');
 //Create the error message where the user hasn't chosen a contact method.
@@ -520,7 +527,12 @@ function emptyDurationChecker(){
     let isError = false;
     if(!contactForm.endDate.value){
         removeElements(incorrectStartDate, emptyStartDate);
-        contactForm.insertBefore(emptyDurationError, document.getElementById('start-and-end-date'));
+        if(window.innerWidth < 576){
+            document.getElementById('start-and-end-date').insertBefore(emptyDurationError, document.getElementById('contact__form-end-date'));
+        }else{
+            contactForm.insertBefore(emptyDurationError, document.getElementById('start-and-end-date'));
+        }
+        
         isError = true;
     }else{
         emptyDurationError.remove();
@@ -667,6 +679,38 @@ contactForm.submit.onclick = function(){
 contactForm.onsubmit = function(e){
     e.preventDefault();
 }
+
+/**
+ * If it has been added to the form, then reposition the empty duration error form element whenever our incumbent media query changes, thus
+   compelling us to put this element in its right place.
+ * @param {'expand','contract'} type Based on what our incumbent media query has changed to, this parameter will specify how we should reposition
+   our empty duration error element.
+ */
+function repositionEmptyDurationError(type){
+    const durEle = document.getElementById('empty-duration-error');
+    if(durEle === undefined) return;
+    if(type === 'expand'){
+        durEle.remove();
+        contactForm.insertBefore(durEle, document.getElementById('start-and-end-date'));
+        return;
+    }
+    if(type === 'contract'){
+        durEle.remove();
+        document.getElementById('start-and-end-date').insertBefore(durEle, document.getElementById('contact__form-end-date'));
+        return;
+    }
+}
+//END OF FORM SECTION
+//
+//
+//
+
+
+
+//START OF CONTACT MODAL SECTION
+//
+//
+//
 
 //Get access to the <main> element of our page so that we can insert our contact modal as the very last child of it
 const mainEle = document.getElementById('main');
