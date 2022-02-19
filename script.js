@@ -5,8 +5,8 @@
 
 /* GLOBAL Cubic Bezier easing values, used for the transition. */
 const easeInOutSine = 'cubic-bezier(0.37, 0, 0.63, 1)';
-const easeOutBack = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
-const easeInBack = 'cubic-bezier(0.36, 0, 0.66, -0.56)';
+const easeOutBack = 'cubic-bezier(0.34, 1.60, 0.64, 1)';
+const easeInBack = 'cubic-bezier(0.36, 0, 0.64, -0.65)';
 
 /**
  * The actual <header> element of the document.
@@ -44,6 +44,19 @@ const sortOutMainMenu = (function() {
      */
     let offsetTopStore = document.body.getBoundingClientRect().top;
     /**
+     * Sort out the global 'isCollapsed' Boolean, when our incumbent media query is a small one, so that we are ready for when our small media
+       query transitions back to a larger one again, and hence our main header goes back to its larger mode.
+     * @param offsetTop Comes directly from 'offsetTop', as declared in the main function.
+     */
+    function sortOutIsCollapsed(offsetTop){
+        if(offsetTop < 40){
+            isCollapsed = true;
+        }
+        if(offsetTop > 39){
+            isCollapsed = false;
+        }
+    }
+    /**
      * Used to animate, when necessary, the header when our larger media query is currently incumbemnt.
      * @param offsetTop Comes directly from 'offsetTop', as declared in the main function.
      * @returns void
@@ -80,6 +93,7 @@ const sortOutMainMenu = (function() {
         counter++;
         const offsetTop = document.body.getBoundingClientRect().top;
         if(window.innerWidth < 992){
+            sortOutIsCollapsed(offsetTop);
             if(counter < 4 || isWindowResizing || contactModalInAnim){
                 offsetTopStore = offsetTop;
                 return;
@@ -317,21 +331,40 @@ function animateHeaderHamburger(type, duration){
  * @param {number} duration How long our transition should be.
  * @param {string} ease Our transitions ease. Note, since we are using CSS transitions to create our animations, in order for these eases to work,
    the values of this ease parameter will need to correspond to actual CSS ease values.
- * @param {[[string,string]]} keyVales Defines our animation. Is an Array of Array's, the latter of the 2 must contain 2 String values. The first
+ * @param {[[string,string]]} keyValues Defines our animation. Is an Array of Array's, the latter of the 2 must contain 2 String values. The first
    value will correspond to the property that we are targeting for animation, and the latter is the value that we want this property to end up with
    by the time the animation is over.
    @param {function} onComplete An optional callback function that we can activate upon the event of the animation finishing.
  * @returns void
  */
 function transitionElement(element, duration, ease, keyValues, onComplete){
-    const transEle = element;
-    transEle.style.transition = 'all '+duration+'s '+ease;
-    for(let i = 0; i < keyValues.length; i++){
-        const keyValue = keyValues[i];
-        transEle.style[keyValue[0]] = keyValue[1];
+
+
+    function applyStyles(transEle, keyValues){
+        for(let i = 0; i < keyValues.length; i++){
+            const keyValue = keyValues[i];
+            transEle.style[keyValue[0]] = keyValue[1];
+        }
     }
-    transEle.ontransitionend = function(){
+
+    const transEle = element;
+    
+    if(duration === 0){
         transEle.style.transition = '';
+        applyStyles(transEle, keyValues);
+        if(onComplete){
+            onComplete();
+        }
+        return;
+    }
+
+    transEle.style.transition = 'all '+duration+'s '+ease;
+    applyStyles(transEle, keyValues);
+    
+    transEle.ontransitionend = function(){
+        /* Use 'setTimeout' because, without it, there seems to be an error where our transitions get canceled without our transition actually
+        completing yet. */
+        setTimeout(function(){transEle.style.transition = '';}, 0);
         if(onComplete){
             onComplete();
         }
